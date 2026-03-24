@@ -122,6 +122,45 @@ app.delete('/filmes/:id', (req, res) => {
     });
 });
 
+// ✅ ADICIONAR NOVO FILME
+app.post('/filmes', (req, res) => {
+    const { titulo, diretor, ano, genero, nota } = req.body;
+
+    // 🔴 Validação
+    if (!titulo || !diretor || !ano || !genero || nota === undefined) {
+        return res.status(400).json({
+            mensagem: "Todos os campos são obrigatórios"
+        });
+    }
+
+    // 🔢 Gerar ID automático
+    const novoId = filmes.length > 0 
+        ? Math.max(...filmes.map(f => f.id)) + 1 
+        : 1;
+
+    // 🔴 Validação da nota (0 a 10)
+    if (nota < 0 || nota > 10) {
+        return res.status(400).json({
+            mensagem: "A nota deve ser entre 0 e 10"
+        });
+    }
+
+    const novoFilme = {
+        id: novoId,
+        titulo,
+        diretor,
+        ano,
+        genero,
+        nota
+    };
+
+    filmes.push(novoFilme);
+
+    res.status(201).json({
+        mensagem: "Filme criado com sucesso",
+        filme: novoFilme
+    });
+});
 
 app.listen(3000, () => {
   console.log("Servidor rodando em http://localhost:3000");
